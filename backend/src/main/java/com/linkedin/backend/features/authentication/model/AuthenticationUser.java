@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 
+import java.time.LocalDateTime;
+
 @Entity(name = "users")
 public class AuthenticationUser {
     @Id
@@ -15,8 +17,13 @@ public class AuthenticationUser {
     @Email
     @Column(unique = true)
     private String email;
+    private Boolean emailVerified = false;
+    private String emailVerificationToken = null;
+    private LocalDateTime emailVerificationTokenExpiryDate = null;
     @JsonIgnore
     private String password;
+    private String passwordResetToken = null;
+    private LocalDateTime passwordResetTokenExpiryDate = null;
 
     public AuthenticationUser() {
     }
