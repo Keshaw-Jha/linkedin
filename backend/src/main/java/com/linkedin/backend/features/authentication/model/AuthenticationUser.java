@@ -52,4 +52,44 @@ public class AuthenticationUser {
     public void setEmail(String email) {
         this.email = email;
     }
+
+    public Boolean getEmailVerified() {
+        return emailVerified;
+    }
+
+    public void setEmailVerified(Boolean emailVerified) {
+        this.emailVerified = emailVerified;
+    }
+
+    public String getEmailVerificationToken() {
+        return emailVerificationToken;
+    }
+
+    public void setEmailVerificationToken(String emailVerificationToken) {
+        this.emailVerificationToken = emailVerificationToken;
+    }
+
+    public LocalDateTime getEmailVerificationTokenExpiryDate() {
+        return emailVerificationTokenExpiryDate;
+    }
+
+    public void setEmailVerificationTokenExpiryDate(LocalDateTime emailVerificationTokenExpiryDate) {
+        this.emailVerificationTokenExpiryDate = emailVerificationTokenExpiryDate;
+    }
+
+    public String getPasswordResetToken() {
+        return passwordResetToken;
+    }
+
+    public void setPasswordResetToken(String passwordResetToken) {
+        this.passwordResetToken = passwordResetToken;
+    }
+
+    public LocalDateTime getPasswordResetTokenExpiryDate() {
+        return passwordResetTokenExpiryDate;
+    }
+
+    public void setPasswordResetTokenExpiryDate(LocalDateTime passwordResetTokenExpiryDate) {
+        this.passwordResetTokenExpiryDate = passwordResetTokenExpiryDate;
+    }
 }
