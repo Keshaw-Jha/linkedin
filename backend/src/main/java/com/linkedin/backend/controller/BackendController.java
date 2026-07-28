@@ -38,7 +38,7 @@ public class BackendController {
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Map<String, String>> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
         if (e.getMessage().contains("Duplicate entry")) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Email alreday exists, please use another email or login."));
+            return ResponseEntity.badRequest().body(Map.of("message", "Email already exists, please use another email or login."));
         }
         return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
     }
