@@ -8,10 +8,13 @@ import com.linkedin.backend.features.authentication.repository.AuthenticationUse
 import com.linkedin.backend.features.authentication.utils.EmailService;
 import com.linkedin.backend.features.authentication.utils.Encoder;
 import com.linkedin.backend.features.authentication.utils.JsonWebToken;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
@@ -29,7 +32,11 @@ public class AuthenticationService {
     private final EmailService emailService;
     private static final SecureRandom RANDOM = new SecureRandom();
 
-    private AuthenticationService(AuthenticationUserRepository authenticationUserRepository, Encoder encoder, JsonWebToken jsonWebToken, EmailService emailService) {
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    public AuthenticationService(AuthenticationUserRepository authenticationUserRepository, Encoder encoder, JsonWebToken jsonWebToken, EmailService emailService) {
         this.authenticationUserRepository = authenticationUserRepository;
         this.encoder = encoder;
         this.jsonWebToken = jsonWebToken;
@@ -162,4 +169,24 @@ public class AuthenticationService {
         }
     }
 
+    public AuthenticationUser updateUserProfile(Long id, String firstName, String lastName, String company, String position, String location) {
+        AuthenticationUser user = authenticationUserRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        if (firstName != null) user.setFirstName(firstName);
+        if (lastName != null) user.setLastName(lastName);
+        if (company != null) user.setCompany(company);
+        if (position != null) user.setPosition(position);
+        if (location != null) user.setLocation(location);
+
+        return authenticationUserRepository.save(user);
+    }
+
+    @Transactional
+    public void deleteUser(Long userId) {
+        AuthenticationUser user = entityManager.find(AuthenticationUser.class, userId);
+        if (user != null) {
+            entityManager.createNativeQuery("DELETE FROM posts_likes where user_id = :userId").setParameter("userId", userId)
+                    .executeUpdate();
+            authenticationUserRepository.deleteById(userId);
+        }
+    }
 }
