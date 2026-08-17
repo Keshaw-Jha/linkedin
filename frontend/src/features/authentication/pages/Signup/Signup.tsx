@@ -2,7 +2,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { Box } from "../../components/Box/Box";
 import { Button } from "../../components/Button/Button";
 import { Input } from "../../components/Input/Input";
-import { Layout } from "../../components/Layout/Layout";
 import { Seperator } from "../../components/Seperator/Seperator";
 import classes from "./Signup.module.scss";
 import { useState } from "react";
@@ -34,7 +33,7 @@ export default function Signup() {
   };
 
   return (
-    <Layout className={classes.root}>
+    <div className={classes.root}>
       <Box>
         <h1>Sign up</h1>
         <p>Make the most of your professional life.</p>
@@ -53,9 +52,9 @@ export default function Signup() {
         </form>
         <Seperator>Or</Seperator>
         <div className={classes.register}>
-          Already on LinkedIn? <Link to="/login">Sign in </Link>
+          Already on LinkedIn? <Link to="/authentication/login">Sign in </Link>
         </div>
       </Box>
-    </Layout>
+    </div>
   );
 }

@@ -3,7 +3,6 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Box } from "../../components/Box/Box";
 import { Button } from "../../components/Button/Button";
 import { Input } from "../../components/Input/Input";
-import { Layout } from "../../components/Layout/Layout";
 import { Seperator } from "../../components/Seperator/Seperator";
 // import { useAuthentication } from "../../contexts/AuthenticationContextProvider";
 import classes from "./Login.module.scss";
@@ -40,7 +39,7 @@ export default function Login() {
 
   
   return (
-    <Layout className={classes.root}>
+    <div className={classes.root}>
       <Box>
         <h1>Sign in</h1>
         <p>Stay updated on your professional world.</p>
@@ -63,13 +62,13 @@ export default function Login() {
           <Button type="submit" disabled={isLoading}>
             {isLoading ? "..." : "Sign in"}
           </Button>
-          <Link to="/request-password-reset">Forgot password?</Link>
+          <Link to="/authentication/request-password-reset">Forgot password?</Link>
         </form>
         <Seperator>Or</Seperator>
         <div className={classes.register}>
-          New to LinkedIn? <Link to="/signup">Join now</Link>
+          New to LinkedIn? <Link to="/authentication/signup">Join now</Link>
         </div>
       </Box>
-    </Layout>
+    </div>
   );
 }

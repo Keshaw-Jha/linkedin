@@ -1,16 +1,18 @@
 import { useState, type SubmitEvent } from "react";
 import { Box } from "../../components/Box/Box";
 import { Input } from "../../components/Input/Input";
-import { Layout } from "../../components/Layout/Layout";
+import { AuthenticationLayout } from "../../components/AuthenticationLayout/AuthenticationLayout";
 import classes from "./VerifyEmail.module.scss";
 import { Button } from "../../components/Button/Button";
 import { useNavigate } from "react-router-dom";
+import { useAuthentication, type User } from "../../contexts/AuthenticationContextProvider";
 
 export default function VerifyEmail() {
   const [errorMessage, setErrorMessage] = useState("");
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const { user, setUser } = useAuthentication();
 
   const validateEmail = async (code: string) => {
     setMessage("");
@@ -26,7 +28,13 @@ export default function VerifyEmail() {
       );
       if (response.ok) {
         setErrorMessage("");
+        if (user) {
+          setUser((prev: User | null) =>
+            prev ? { ...prev, emailVerified: true } : prev,
+          );
+        }
         navigate("/");
+        return;
       }
       const { message } = await response.json();
       setErrorMessage(message);
@@ -73,7 +81,7 @@ export default function VerifyEmail() {
   };
 
   return (
-    <Layout className={classes.root}>
+    <div className={classes.root}>
       <Box>
         <h1>Verify your email</h1>
         <form onSubmit={submitOnClick}>
@@ -96,6 +104,6 @@ export default function VerifyEmail() {
           </Button>
         </form>
       </Box>
-    </Layout>
+    </div>
   );
 }

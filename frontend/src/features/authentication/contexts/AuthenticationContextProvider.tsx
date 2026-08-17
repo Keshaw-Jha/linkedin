@@ -1,17 +1,18 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  type SyntheticEvent,
-} from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import Loader from "../../../components/Loader/Loader";
 
-interface User {
+export interface User {
   id: string;
   email: string;
   emailVerified: boolean;
+  firstName?: string;
+  lastName?: string;
+  company?: string;
+  position?: string;
+  location?: string;
+  profileComplete: boolean;
+  profilePicture?: string;
 }
 
 interface AuthenticationContextType {
@@ -19,6 +20,7 @@ interface AuthenticationContextType {
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string) => Promise<void>;
   logout: () => void;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
 }
 
 const AuthenticationContext = createContext<AuthenticationContextType | null>(
@@ -35,9 +37,9 @@ export function AuthenticationContextProvider() {
   const location = useLocation();
 
   const isOnAuthPage =
-    location.pathname === "/login" ||
-    location.pathname === "/signup" ||
-    location.pathname === "/request-password-reset";
+    location.pathname === "/authentication/login" ||
+    location.pathname === "/authentication/signup" ||
+    location.pathname === "/authentication/request-password-reset";
 
   const login = async (email: string, password: string) => {
     const response = await fetch(
@@ -118,15 +120,56 @@ export function AuthenticationContextProvider() {
   }
 
   if (!isLoading && !user && !isOnAuthPage) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/authentication/login" />;
   }
 
-  if (user && user.emailVerified && isOnAuthPage) {
+  if (
+    user &&
+    !user.emailVerified &&
+    location.pathname !== "/authentication/verify-email"
+  ) {
+    return <Navigate to="/authentication/verify-email" />;
+  }
+
+  if (
+    user &&
+    user.emailVerified &&
+    location.pathname == "/authentication/verify-email"
+  ) {
     return <Navigate to="/" />;
   }
+
+  if (
+    user &&
+    user.emailVerified &&
+    !user.profileComplete &&
+    !location.pathname.includes("/authentication/profile")
+  ) {
+    return <Navigate to={`/authentication/profile/${user.id}`} />;
+  }
+
+  if (
+    user &&
+    user.emailVerified &&
+    user.profileComplete &&
+    location.pathname.includes("/authentication/profile")
+  ) {
+    return <Navigate to="/" />;
+  }
+
+  if (user && isOnAuthPage) {
+    return <Navigate to="/" />;
+  }
+
   return (
-    <AuthenticationContext.Provider value={{ user, login, signup, logout }}>
-      {user && !user.emailVerified ? <Navigate to="/verify-email" /> : null}
+    <AuthenticationContext.Provider
+      value={{
+        user,
+        login,
+        logout,
+        signup,
+        setUser,
+      }}>
       <Outlet />
     </AuthenticationContext.Provider>
   );
