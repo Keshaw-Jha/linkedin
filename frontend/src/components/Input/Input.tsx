@@ -1,6 +1,6 @@
 import type { InputHTMLAttributes } from "react";
 import classes from "./Input.module.scss";
-type InputProps = InputHTMLAttributes<HTMLInputElement> & {
+type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, "size"> & {
   label?: string;
   size?: "small" | "medium" | "large";
 };
@@ -13,7 +13,7 @@ export function Input({ label, size, width, ...others }: InputProps) {
           {label}
         </label>
       ) : null}
-      <input {...others} style={{width: width? `${width}px`:"100"}}/>
+      <input {...others} style={{ width: width ? `${width}px` : "100" }} />
     </div>
   );
 }

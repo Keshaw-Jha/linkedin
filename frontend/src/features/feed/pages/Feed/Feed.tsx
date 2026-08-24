@@ -6,7 +6,7 @@ import { useAuthentication } from "../../../authentication/contexts/Authenticati
 import classes from "./Feed.module.scss";
 import LeftSidebar from "../../components/LeftSidebar/LeftSidebar.tsx";
 import RightSidebar from "../../components/RightSidebar/RightSidebar.tsx";
-import Post from "../../components/Post/Post.tsx";
+import Post, { type Post as PostType } from "../../components/Post/Post.tsx";
 import { Madal } from "../../components/Modal/Modal.tsx";
 
 export default function Feed() {
@@ -17,7 +17,7 @@ export default function Feed() {
   );
   const { user } = useAuthentication();
   const navigate = useNavigate();
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [posts, setPosts] = useState<PostType[]>([]);
   const [error, setError] = useState("");
 
   useEffect(() => {
