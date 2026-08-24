@@ -8,20 +8,24 @@ import com.linkedin.backend.features.feed.model.Comment;
 import com.linkedin.backend.features.feed.model.Post;
 import com.linkedin.backend.features.feed.repository.CommentRepository;
 import com.linkedin.backend.features.feed.repository.PostRepository;
+import com.linkedin.backend.features.notifications.service.NotificationService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class FeedService {
     private final PostRepository postRepository;
     private final AuthenticationUserRepository userRepository;
     private final CommentRepository commentRepository;
+    private final NotificationService notificationService;
 
-    public FeedService(PostRepository postRepository, AuthenticationUserRepository userRepository, CommentRepository commentRepository) {
+    public FeedService(PostRepository postRepository, AuthenticationUserRepository userRepository, CommentRepository commentRepository, NotificationService notificationService) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.commentRepository = commentRepository;
+        this.notificationService = notificationService;
     }
 
 
@@ -80,8 +84,11 @@ public class FeedService {
             post.getLikes().remove(user);
         } else {
             post.getLikes().add(user);
+            notificationService.sendLikeNotification(user, post.getAuthor(), post.getId());
         }
-        return postRepository.save(post);
+        Post savedPost = postRepository.save(post);
+        notificationService.sendLikeToPost(post.getId(), savedPost.getLikes());
+        return savedPost;
     }
 
     public Comment addComment(Long postId, Long userId, String content) {
@@ -89,8 +96,10 @@ public class FeedService {
         Post post = postRepository.findById(postId).orElseThrow(() ->
                 new IllegalArgumentException("Post not found.")
         );
-        Comment newComment = new Comment(post, user, content);
-        return commentRepository.save(newComment);
+        Comment comment = commentRepository.save(new Comment(post, user, content));
+        notificationService.sendCommentNotification(user, comment.getAuthor(), post.getId());
+        notificationService.sendCommentToPost(post.getId(), comment);
+        return comment;
     }
 
     public Comment editComment(Long commentId, Long userId, String newContent) {
@@ -115,5 +124,15 @@ public class FeedService {
             throw new IllegalArgumentException("User is not the author of the comment.");
         }
         commentRepository.delete(comment);
+    }
+
+    public List<Comment> getPostComments(Long postId) {
+        Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Post not found."));
+        return post.getComments();
+    }
+
+    public Set<AuthenticationUser> getPostLikes(Long postId) {
+        Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Post not found."));
+        return post.getLikes();
     }
 }

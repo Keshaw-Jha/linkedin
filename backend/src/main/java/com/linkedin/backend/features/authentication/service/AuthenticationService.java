@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -188,5 +189,9 @@ public class AuthenticationService {
                     .executeUpdate();
             authenticationUserRepository.deleteById(userId);
         }
+    }
+
+    public List<AuthenticationUser> getUsersWithoutAuthenticated(AuthenticationUser user) {
+        return authenticationUserRepository.findAllByIdNot(user.getId());
     }
 }

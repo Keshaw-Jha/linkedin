@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/feed")
@@ -63,6 +64,12 @@ public class FeedController {
         return ResponseEntity.ok(comment);
     }
 
+    @GetMapping("/posts/{postId}/comments")
+    public ResponseEntity<List<Comment>> getComments(@PathVariable Long postId) {
+        List<Comment> comments = feedService.getPostComments(postId);
+        return ResponseEntity.ok(comments);
+    }
+
     @DeleteMapping("/comments/{commentId}")
     public ResponseEntity<Void> deleteComment(@PathVariable Long commentId, @RequestAttribute("authenticatedUser") AuthenticationUser user) {
         feedService.deleteComment(commentId, user.getId());
@@ -80,6 +87,12 @@ public class FeedController {
     public ResponseEntity<Post> likePost(@PathVariable Long postId, @RequestAttribute("authenticatedUser") AuthenticationUser user) {
         Post post = feedService.likePost(postId, user.getId());
         return ResponseEntity.ok(post);
+    }
+
+    @GetMapping("/posts/{postId}/likes")
+    public ResponseEntity<Set<AuthenticationUser>> getPostLikes(@PathVariable Long postId) {
+        Set<AuthenticationUser> likes = feedService.getPostLikes(postId);
+        return ResponseEntity.ok(likes);
     }
 
     @GetMapping("/posts/user/{userId}")

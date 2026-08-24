@@ -1,4 +1,6 @@
 package com.linkedin.backend.features.notifications.model;
 
-public class NotificationType {
+public enum NotificationType {
+    LIKE,
+    COMMENT,
 }

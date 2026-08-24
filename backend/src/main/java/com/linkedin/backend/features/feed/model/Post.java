@@ -1,6 +1,7 @@
 package com.linkedin.backend.features.feed.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.linkedin.backend.features.authentication.model.AuthenticationUser;
 import jakarta.persistence.*;
@@ -36,6 +37,7 @@ public class Post {
     @JoinColumn(name = "author_id", nullable = false)
     private AuthenticationUser author;
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable(name = "posts_likes", joinColumns = @JoinColumn(name = "post_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
@@ -47,7 +49,7 @@ public class Post {
 
     private LocalDateTime updateDate;
 
-
+    @JsonIgnore
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
 
@@ -111,6 +113,14 @@ public class Post {
 
     public void setUpdateDate(LocalDateTime updateDate) {
         this.updateDate = updateDate;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
     }
 
     public Set<AuthenticationUser> getLikes() {
