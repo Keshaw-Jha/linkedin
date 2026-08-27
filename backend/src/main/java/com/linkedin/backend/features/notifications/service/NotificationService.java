@@ -2,6 +2,8 @@ package com.linkedin.backend.features.notifications.service;
 
 import com.linkedin.backend.features.authentication.model.AuthenticationUser;
 import com.linkedin.backend.features.feed.model.Comment;
+import com.linkedin.backend.features.messaging.model.Conversation;
+import com.linkedin.backend.features.messaging.model.Message;
 import com.linkedin.backend.features.notifications.model.Notification;
 import com.linkedin.backend.features.notifications.model.NotificationType;
 import com.linkedin.backend.features.notifications.repository.NotificationRepository;
@@ -75,5 +77,14 @@ public class NotificationService {
         notification.setRead(true);
         messagingTemplate.convertAndSend("/topic/users/" + notification.getRecipient().getId() + "/notifications", notification);
         return notificationRepository.save(notification);
+    }
+
+    public void sendConversationToUsers(Long senderId, Long receiverId, Conversation conversation) {
+        messagingTemplate.convertAndSend("/topic/users/" + senderId + "/conversations", conversation);
+        messagingTemplate.convertAndSend("/topic/users/" + receiverId + "/conversations", conversation);
+    }
+
+    public void sendMessageToConversation(Long conversationId, Message message) {
+        messagingTemplate.convertAndSend("/topic/conversations/" + conversationId + "/messages", message);
     }
 }

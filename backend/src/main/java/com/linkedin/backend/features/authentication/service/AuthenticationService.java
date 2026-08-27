@@ -194,4 +194,8 @@ public class AuthenticationService {
     public List<AuthenticationUser> getUsersWithoutAuthenticated(AuthenticationUser user) {
         return authenticationUserRepository.findAllByIdNot(user.getId());
     }
+
+    public AuthenticationUser getUserById(Long id) {
+        return authenticationUserRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+    }
 }
