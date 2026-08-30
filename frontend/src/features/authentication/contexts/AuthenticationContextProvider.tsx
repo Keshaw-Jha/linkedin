@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import Loader from "../../../components/Loader/Loader";
 
-export interface User {
+export interface IUser {
   id: string;
   email: string;
   emailVerified: boolean;
@@ -16,11 +16,11 @@ export interface User {
 }
 
 interface AuthenticationContextType {
-  user: User | null;
+  user: IUser | null;
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string) => Promise<void>;
   logout: () => void;
-  setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  setUser: React.Dispatch<React.SetStateAction<IUser | null>>;
 }
 
 const AuthenticationContext = createContext<AuthenticationContextType | null>(
@@ -32,7 +32,7 @@ export function useAuthentication() {
 }
 
 export function AuthenticationContextProvider() {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<IUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const location = useLocation();
 

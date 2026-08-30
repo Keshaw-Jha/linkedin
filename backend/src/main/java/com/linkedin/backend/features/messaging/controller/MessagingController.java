@@ -40,7 +40,7 @@ public class MessagingController {
         return messagingService.addMessageToConversation(conversationId, sender, messageDto.receiverId(), messageDto.content());
     }
 
-    @PutMapping("/conversations/{conversationId}/messages/{messageId}")
+    @PutMapping("/conversations/messages/{messageId}")
     public Response markMessageAsRead(@RequestAttribute("authenticatedUser") AuthenticationUser user, @PathVariable Long messageId) {
         messagingService.markMessageAsRead(user, messageId);
         return new Response("Message marked as read");
