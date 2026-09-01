@@ -1,11 +1,13 @@
 import { useState, type SubmitEvent } from "react";
 import { Box } from "../../components/Box/Box";
 import { Input } from "../../components/Input/Input";
-import { AuthenticationLayout } from "../../components/AuthenticationLayout/AuthenticationLayout";
 import classes from "./VerifyEmail.module.scss";
 import { Button } from "../../components/Button/Button";
 import { useNavigate } from "react-router-dom";
-import { useAuthentication, type User } from "../../contexts/AuthenticationContextProvider";
+import {
+  useAuthentication,
+  type IUser,
+} from "../../contexts/AuthenticationContextProvider";
 
 export default function VerifyEmail() {
   const [errorMessage, setErrorMessage] = useState("");
@@ -29,7 +31,7 @@ export default function VerifyEmail() {
       if (response.ok) {
         setErrorMessage("");
         if (user) {
-          setUser((prev: User | null) =>
+          setUser((prev: IUser | null) =>
             prev ? { ...prev, emailVerified: true } : prev,
           );
         }

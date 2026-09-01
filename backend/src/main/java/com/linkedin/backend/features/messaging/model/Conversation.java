@@ -1,6 +1,6 @@
 package com.linkedin.backend.features.messaging.model;
 
-import com.linkedin.backend.features.authentication.model.AuthenticationUser;
+import com.linkedin.backend.features.authentication.model.User;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -13,10 +13,10 @@ public class Conversation {
     private Long id;
 
     @ManyToOne(optional = false)
-    private AuthenticationUser author;
+    private User author;
 
     @ManyToOne(optional = false)
-    private AuthenticationUser recipient;
+    private User recipient;
 
     @OneToMany(mappedBy = "conversation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Message> messages = new ArrayList<>();
@@ -24,7 +24,7 @@ public class Conversation {
     public Conversation() {
     }
 
-    public Conversation(AuthenticationUser author, AuthenticationUser recipient) {
+    public Conversation(User author, User recipient) {
         this.author = author;
         this.recipient = recipient;
     }
@@ -37,19 +37,19 @@ public class Conversation {
         this.id = id;
     }
 
-    public AuthenticationUser getAuthor() {
+    public User getAuthor() {
         return author;
     }
 
-    public void setAuthor(AuthenticationUser author) {
+    public void setAuthor(User author) {
         this.author = author;
     }
 
-    public AuthenticationUser getRecipient() {
+    public User getRecipient() {
         return recipient;
     }
 
-    public void setRecipient(AuthenticationUser recipient) {
+    public void setRecipient(User recipient) {
         this.recipient = recipient;
     }
 

@@ -3,7 +3,7 @@ package com.linkedin.backend.features.feed.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.linkedin.backend.features.authentication.model.AuthenticationUser;
+import com.linkedin.backend.features.authentication.model.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import org.hibernate.annotations.CreationTimestamp;
@@ -35,14 +35,14 @@ public class Post {
 
     @ManyToOne
     @JoinColumn(name = "author_id", nullable = false)
-    private AuthenticationUser author;
+    private User author;
 
     @JsonIgnore
     @ManyToMany
     @JoinTable(name = "posts_likes", joinColumns = @JoinColumn(name = "post_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    private Set<AuthenticationUser> likes;
+    private Set<User> likes;
 
     @CreationTimestamp
     private LocalDateTime creationDate;
@@ -62,7 +62,7 @@ public class Post {
     public Post() {
     }
 
-    public Post(String content, AuthenticationUser author) {
+    public Post(String content, User author) {
         this.author = author;
         this.content = content;
     }
@@ -91,11 +91,11 @@ public class Post {
         this.picture = picture;
     }
 
-    public AuthenticationUser getAuthor() {
+    public User getAuthor() {
         return author;
     }
 
-    public void setAuthor(AuthenticationUser author) {
+    public void setAuthor(User author) {
         this.author = author;
     }
 
@@ -123,11 +123,11 @@ public class Post {
         this.comments = comments;
     }
 
-    public Set<AuthenticationUser> getLikes() {
+    public Set<User> getLikes() {
         return likes;
     }
 
-    public void setLikes(Set<AuthenticationUser> likes) {
+    public void setLikes(Set<User> likes) {
         this.likes = likes;
     }
 }

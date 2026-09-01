@@ -3,6 +3,7 @@ package com.linkedin.backend.features.authentication.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.linkedin.backend.features.feed.model.Post;
 import com.linkedin.backend.features.messaging.model.Conversation;
+import com.linkedin.backend.features.networking.model.Connection;
 import com.linkedin.backend.features.notifications.model.Notification;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity(name = "users")
-public class AuthenticationUser {
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -49,44 +50,27 @@ public class AuthenticationUser {
     private List<Post> posts;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "author",cascade=CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Conversation> conversationsAsAuthor;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "recipient",cascade=CascadeType.ALL, orphanRemoval = true)
-    private List<Conversation> conversationsAsAuthorAsRecipient;
+    @OneToMany(mappedBy = "recipient", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Conversation> conversationsAsRecipient;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Connection> initiatedConnections;
 
-    public AuthenticationUser() {
-    }
+    @JsonIgnore
+    @OneToMany(mappedBy = "recipient", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Connection> receivedConnections;
 
-    public AuthenticationUser(String email, String password) {
+    public User(String email, String password) {
         this.email = email;
         this.password = password;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    private void updateProfileCompletionStatus() {
-        this.profileComplete = (this.firstName != null && this.lastName != null && this.company != null && this.position != null && this.location != null);
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
+    public User() {
     }
 
     public Boolean getEmailVerified() {
@@ -95,6 +79,10 @@ public class AuthenticationUser {
 
     public void setEmailVerified(Boolean emailVerified) {
         this.emailVerified = emailVerified;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     public String getEmailVerificationToken() {
@@ -129,6 +117,14 @@ public class AuthenticationUser {
         this.passwordResetTokenExpiryDate = passwordResetTokenExpiryDate;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public String getFirstName() {
         return firstName;
     }
@@ -147,12 +143,12 @@ public class AuthenticationUser {
         updateProfileCompletionStatus();
     }
 
-    public String getCompany() {
-        return company;
+    public String getLocation() {
+        return location;
     }
 
-    public void setCompany(String company) {
-        this.company = company;
+    public void setLocation(String location) {
+        this.location = location;
         updateProfileCompletionStatus();
     }
 
@@ -165,26 +161,25 @@ public class AuthenticationUser {
         updateProfileCompletionStatus();
     }
 
-    public String getLocation() {
-        return location;
-
+    public String getCompany() {
+        return company;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
-        updateProfileCompletionStatus();
+    public void setCompany(String company) {
+        this.company = company;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void updateProfileCompletionStatus() {
+        this.profileComplete = (this.firstName != null && this.lastName != null && this.company != null
+                && this.position != null && this.location != null);
     }
 
     public Boolean getProfileComplete() {
         return profileComplete;
-    }
-
-    public String getProfilePicture() {
-        return profilePicture;
-    }
-
-    public void setProfilePicture(String profilePicture) {
-        this.profilePicture = profilePicture;
     }
 
     public List<Post> getPosts() {
@@ -195,12 +190,12 @@ public class AuthenticationUser {
         this.posts = posts;
     }
 
-    public List<Notification> getActedNotifications() {
-        return actedNotifications;
+    public String getProfilePicture() {
+        return profilePicture;
     }
 
-    public void setActedNotifications(List<Notification> actedNotifications) {
-        this.actedNotifications = actedNotifications;
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
     }
 
     public List<Notification> getReceivedNotifications() {
@@ -211,12 +206,12 @@ public class AuthenticationUser {
         this.receivedNotifications = receivedNotifications;
     }
 
-    public List<Conversation> getConversationsAsAuthorAsRecipient() {
-        return conversationsAsAuthorAsRecipient;
+    public List<Notification> getActedNotifications() {
+        return actedNotifications;
     }
 
-    public void setConversationsAsAuthorAsRecipient(List<Conversation> conversationsAsAuthorAsRecipient) {
-        this.conversationsAsAuthorAsRecipient = conversationsAsAuthorAsRecipient;
+    public void setActedNotifications(List<Notification> actedNotifications) {
+        this.actedNotifications = actedNotifications;
     }
 
     public List<Conversation> getConversationsAsAuthor() {
@@ -225,5 +220,29 @@ public class AuthenticationUser {
 
     public void setConversationsAsAuthor(List<Conversation> conversationsAsAuthor) {
         this.conversationsAsAuthor = conversationsAsAuthor;
+    }
+
+    public List<Conversation> getConversationsAsRecipient() {
+        return conversationsAsRecipient;
+    }
+
+    public void setConversationsAsRecipient(List<Conversation> conversationsAsRecipient) {
+        this.conversationsAsRecipient = conversationsAsRecipient;
+    }
+
+    public List<Connection> getInitiatedConnections() {
+        return initiatedConnections;
+    }
+
+    public void setInitiatedConnections(List<Connection> initiatedConnections) {
+        this.initiatedConnections = initiatedConnections;
+    }
+
+    public List<Connection> getReceivedConnections() {
+        return receivedConnections;
+    }
+
+    public void setReceivedConnections(List<Connection> receivedConnections) {
+        this.receivedConnections = receivedConnections;
     }
 }

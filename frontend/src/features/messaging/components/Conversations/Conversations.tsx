@@ -1,7 +1,6 @@
 import { useEffect, useState, type CSSProperties } from "react";
 import classes from "./Conversations.module.scss";
 import type { IUser } from "../../../authentication/contexts/AuthenticationContextProvider";
-import type { Message } from "@stomp/stompjs";
 import Conversation from "../Conversation/Conversation";
 import { request } from "../../../../utils/api";
 import type { IMessage } from "../Messages/Messages";

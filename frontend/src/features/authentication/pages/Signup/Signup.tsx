@@ -4,7 +4,7 @@ import { Button } from "../../components/Button/Button";
 import { Input } from "../../components/Input/Input";
 import { Seperator } from "../../components/Seperator/Seperator";
 import classes from "./Signup.module.scss";
-import { useState } from "react";
+import { useState, type SubmitEvent } from "react";
 import { useAuthentication } from "../../contexts/AuthenticationContextProvider";
 
 export default function Signup() {
@@ -13,7 +13,7 @@ export default function Signup() {
   const { signup } = useAuthentication();
   const navigate = useNavigate();
 
-  const doSignup = async (e: SubmitEvent<HTMLButtonElement>) => {
+  const doSignup = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     const email = e.currentTarget.email.value;

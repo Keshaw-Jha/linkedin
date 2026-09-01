@@ -1,7 +1,7 @@
 import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { request } from "../../../../utils/api";
-import { type User } from "../../../authentication/contexts/AuthenticationContextProvider";
+import { type IUser } from "../../../authentication/contexts/AuthenticationContextProvider";
 import classes from "./Notifications.module.scss";
 import LeftSidebar from "../../components/LeftSidebar/LeftSidebar";
 import RightSidebar from "../../components/RightSidebar/RightSidebar";
@@ -12,10 +12,10 @@ enum NotificationType {
   COMMENT = "COMMENT",
 }
 
-export interface Notification {
+export interface INotification {
   id: number;
-  recipient: User;
-  actor: User;
+  recipient: IUser;
+  actor: IUser;
   read: boolean;
   type: NotificationType;
   resourceId: number;
@@ -23,11 +23,11 @@ export interface Notification {
 }
 
 export default function Notifications() {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notifications, setNotifications] = useState<INotification[]>([]);
 
   useEffect(() => {
     const fetchNotifications = async () => {
-      await request<Notification[]>({
+      await request<INotification[]>({
         endpoint: "/api/v1/notifications",
         onSuccess: setNotifications,
         onFailure: (error) => console.log(error),
@@ -70,9 +70,9 @@ function Notification({
   notification,
   setNotifications,
 }: {
-  notification: Notification;
+  notification: INotification;
 
-  setNotifications: Dispatch<SetStateAction<Notification[]>>;
+  setNotifications: Dispatch<SetStateAction<INotification[]>>;
 }) {
   const navigate = useNavigate();
 
@@ -104,7 +104,7 @@ function Notification({
           : `${classes.notification} ${classes.unread}`
       }>
       <img
-        src={notification.actor.profilePicture}
+        src={notification.actor.profilePicture || "/avatar.png"}
         alt=""
         className={classes.avatar}
       />

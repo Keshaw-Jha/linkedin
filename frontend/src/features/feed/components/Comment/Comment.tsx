@@ -3,21 +3,21 @@ import { useNavigate } from "react-router-dom";
 import { Input } from "../../../../components/Input/Input";
 import {
   useAuthentication,
-  type User,
+  type IUser,
 } from "../../../authentication/contexts/AuthenticationContextProvider";
 import timeAgo from "../../utils/date";
 import classes from "./Comment.module.scss";
 
-export interface Comment {
+export interface IComment {
   id: number;
   content: string;
-  author: User;
+  author: IUser;
   creationDate: string;
   updatedDate?: string;
 }
 
 interface CommentProps {
-  comment: Comment;
+  comment: IComment;
   deleteComment: (commentId: number) => Promise<void>;
   editComment: (commentId: number, content: string) => Promise<void>;
 }

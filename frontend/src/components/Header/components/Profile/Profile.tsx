@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useEffect, useRef } from "react";
+import { type Dispatch, type SetStateAction, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../../../Button/Button";
 import classes from "./Profile.module.scss";
@@ -79,9 +79,6 @@ export default function Profile({
               View Profile
             </Button>
 
-            <Link to="/settings" onClick={() => setShowProfileMenu(false)}>
-              Settings & Privacy
-            </Link>
             <Link
               to="/logout"
               onClick={(e) => {

@@ -3,8 +3,8 @@ package com.linkedin.backend.features.authentication.controller;
 
 import com.linkedin.backend.features.authentication.dto.AuthenticationRequestBody;
 import com.linkedin.backend.features.authentication.dto.AuthenticationResponseBody;
-import com.linkedin.backend.features.authentication.model.AuthenticationUser;
-import com.linkedin.backend.features.authentication.repository.AuthenticationUserRepository;
+import com.linkedin.backend.features.authentication.model.User;
+import com.linkedin.backend.features.authentication.repository.UserRepository;
 import com.linkedin.backend.features.authentication.service.AuthenticationService;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
@@ -20,15 +20,15 @@ import java.util.List;
 public class AuthenticationController {
 
     private final AuthenticationService authenticationUserService;
-    private final AuthenticationUserRepository authenticationUserRepository;
+    private final UserRepository authenticationUserRepository;
 
-    public AuthenticationController(AuthenticationService authenticationService, AuthenticationUserRepository authenticationUserRepository) {
+    public AuthenticationController(AuthenticationService authenticationService, UserRepository authenticationUserRepository) {
         this.authenticationUserService = authenticationService;
         this.authenticationUserRepository = authenticationUserRepository;
     }
 
     @GetMapping("/user")
-    public AuthenticationUser getUser(@RequestAttribute("authenticatedUser") AuthenticationUser authenticationUser) {
+    public User getUser(@RequestAttribute("authenticatedUser") User authenticationUser) {
         return authenticationUserService.getUser(authenticationUser.getEmail());
     }
 
@@ -38,7 +38,7 @@ public class AuthenticationController {
     }
 
     @DeleteMapping("/delete")
-    public String deleteUser(@RequestAttribute("authenticatedUser") AuthenticationUser user) {
+    public String deleteUser(@RequestAttribute("authenticatedUser") User user) {
         authenticationUserService.deleteUser(user.getId());
         return "User deleted successfully.";
     }
@@ -49,13 +49,13 @@ public class AuthenticationController {
     }
 
     @PutMapping("/validate-email-verification-token")
-    public String verifyEmail(@RequestParam String token, @RequestAttribute("authenticatedUser") AuthenticationUser user) {
+    public String verifyEmail(@RequestParam String token, @RequestAttribute("authenticatedUser") User user) {
         authenticationUserService.validateEmailVerificationToken(token, user.getEmail());
         return "Email verified successfully.";
     }
 
     @GetMapping("/send-email-verification-token")
-    public String sendEmailVerificationToken(@RequestAttribute("authenticatedUser") AuthenticationUser user) {
+    public String sendEmailVerificationToken(@RequestAttribute("authenticatedUser") User user) {
         authenticationUserService.sendEmailVerificationToken(user.getEmail());
         return "Email verification token sent successfully.";
     }
@@ -73,8 +73,8 @@ public class AuthenticationController {
     }
 
     @PutMapping("/profile/{id}")
-    public AuthenticationUser updateUserProfile(
-            @RequestAttribute("authenticatedUser") AuthenticationUser user,
+    public User updateUserProfile(
+            @RequestAttribute("authenticatedUser") User user,
             @PathVariable Long id,
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) String lastName,
@@ -89,7 +89,7 @@ public class AuthenticationController {
     }
 
     @GetMapping("/users")
-    public List<AuthenticationUser> getUsersWithoutAuthenticated(@RequestAttribute("authenticatedUser") AuthenticationUser user) {
+    public List<User> getUsersWithoutAuthenticated(@RequestAttribute("authenticatedUser") User user) {
         return authenticationUserService.getUsersWithoutAuthenticated(user);
     }
 }

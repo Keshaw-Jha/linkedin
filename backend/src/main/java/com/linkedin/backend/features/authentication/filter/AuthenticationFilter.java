@@ -1,6 +1,6 @@
 package com.linkedin.backend.features.authentication.filter;
 
-import com.linkedin.backend.features.authentication.model.AuthenticationUser;
+import com.linkedin.backend.features.authentication.model.User;
 import com.linkedin.backend.features.authentication.service.AuthenticationService;
 import com.linkedin.backend.features.authentication.utils.JsonWebToken;
 import jakarta.servlet.FilterChain;
@@ -62,7 +62,7 @@ public class AuthenticationFilter extends HttpFilter {
                 throw new ServletException("Invalid token");
             }
             String email = jsonWebTokenService.getEmailFromToken(token);
-            AuthenticationUser user = authenticationService.getUser(email);
+            User user = authenticationService.getUser(email);
             request.setAttribute("authenticatedUser", user);
             chain.doFilter(request, response);
         } catch (Exception e) {

@@ -1,7 +1,7 @@
 package com.linkedin.backend.features.messaging.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.linkedin.backend.features.authentication.model.AuthenticationUser;
+import com.linkedin.backend.features.authentication.model.User;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -14,10 +14,10 @@ public class Message {
     private Long id;
 
     @ManyToOne(optional = false)
-    private AuthenticationUser sender;
+    private User sender;
 
     @ManyToOne(optional = false)
-    private AuthenticationUser receiver;
+    private User receiver;
 
     @JsonIgnore
     @ManyToOne(optional = false)
@@ -32,7 +32,7 @@ public class Message {
     public Message() {
     }
 
-    public Message(AuthenticationUser sender, AuthenticationUser receiver, Conversation conversation, String content) {
+    public Message(User sender, User receiver, Conversation conversation, String content) {
         this.sender = sender;
         this.receiver = receiver;
         this.conversation = conversation;
@@ -48,19 +48,19 @@ public class Message {
         return id;
     }
 
-    public AuthenticationUser getReceiver() {
+    public User getReceiver() {
         return receiver;
     }
 
-    public void setReceiver(AuthenticationUser receiver) {
+    public void setReceiver(User receiver) {
         this.receiver = receiver;
     }
 
-    public AuthenticationUser getSender() {
+    public User getSender() {
         return sender;
     }
 
-    public void setSender(AuthenticationUser sender) {
+    public void setSender(User sender) {
         this.sender = sender;
     }
 

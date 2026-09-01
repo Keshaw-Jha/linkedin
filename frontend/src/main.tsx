@@ -16,9 +16,12 @@ import { AuthenticationLayout } from "./features/authentication/components/Authe
 import { ApplicationLayout } from "./components/ApplicationLayout/ApplicationLayout";
 import Profile from "./features/authentication/pages/Profile/Profile";
 import Notifications from "./features/feed/pages/Notifications/Notifications";
-import { PostPage } from "./features/feed/pages/Post/post";
 import Messaging from "./features/messaging/pages/Messaging/Messaging";
 import Conversation from "./features/messaging/pages/Conversation/Conversation";
+import { Network } from "./features/networking/pages/Network/Network";
+import { Invitations } from "./features/networking/pages/Invitations/Invitations";
+import { Connections } from "./features/networking/pages/Connections/Connections";
+import { PostPage } from "./features/feed/pages/Post/Post";
 
 const router = createBrowserRouter([
   {
@@ -38,7 +41,21 @@ const router = createBrowserRouter([
           },
           {
             path: "network",
-            element: <div>Network</div>,
+            element: <Network />,
+            children: [
+              {
+                index: true,
+                element: <Navigate to="invitations" />,
+              },
+              {
+                path: "invitations",
+                element: <Invitations />,
+              },
+              {
+                path: "connections",
+                element: <Connections />,
+              },
+            ],
           },
           {
             path: "jobs",

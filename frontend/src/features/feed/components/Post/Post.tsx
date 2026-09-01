@@ -7,53 +7,49 @@ import {
 } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input } from "../../../../components/Input/Input";
+import { request } from "../../../../utils/api";
 import {
+  type IUser,
   useAuthentication,
-  type User,
 } from "../../../authentication/contexts/AuthenticationContextProvider";
-import { Comment } from "../Comment/Comment.tsx";
+import { Comment, type IComment } from "../Comment/Comment";
+import { Madal } from "../Modal/Modal";
+import TimeAgo from "../TimeAgo/TimeAgo";
 import classes from "./Post.module.scss";
-import { Madal } from "../Modal/Modal.tsx";
-import TimeAgo from "../TimeAgo/TimeAgo.tsx";
-import { request } from "../../../../utils/api.ts";
-import { useWebSocket } from "../../../ws/WsContext.ts";
+import { useWebSocket } from "../../../ws/WsContext";
 
-export interface Post {
+export interface IPost {
   id: number;
   content: string;
-  author: User;
+  author: IUser;
   picture?: string;
-  likes?: User[];
-  comments?: Comment[];
   creationDate: string;
   updatedDate?: string;
 }
 
 interface PostProps {
-  post: Post;
-  setPosts: Dispatch<SetStateAction<Post[]>>;
+  post: IPost;
+  setPosts: Dispatch<SetStateAction<IPost[]>>;
 }
 
 export default function Post({ post, setPosts }: PostProps) {
+  const [comments, setComments] = useState<IComment[]>([]);
   const [showComments, setShowComments] = useState(false);
+  const [likes, setLikes] = useState<IUser[]>([]);
   const [content, setContent] = useState("");
   const navigate = useNavigate();
-  const { user } = useAuthentication() ?? {};
+  const { user } = useAuthentication();
   const [showMenu, setShowMenu] = useState(false);
   const [editing, setEditing] = useState(false);
   const webSocketClient = useWebSocket();
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [likes, setLikes] = useState<User[]>([]);
 
   const [postLiked, setPostLiked] = useState<boolean | undefined>(undefined);
 
   useEffect(() => {
     const fetchComments = async () => {
-      await request<Comment[]>({
+      await request<IComment[]>({
         endpoint: `/api/v1/feed/posts/${post.id}/comments`,
-        onSuccess: (data) => {
-          setComments(data);
-        },
+        onSuccess: (data) => setComments(data),
         onFailure: (error) => {
           console.error(error);
         },
@@ -64,30 +60,72 @@ export default function Post({ post, setPosts }: PostProps) {
 
   useEffect(() => {
     const subscription = webSocketClient?.subscribe(
-      `/topic/likes/${post?.id}`,
+      `/topic/likes/${post.id}`,
       (message) => {
         const likes = JSON.parse(message.body);
         setLikes(likes);
-        setPostLiked(likes.some((like: User) => like.id === user?.id));
+        setPostLiked(likes.some((like: IUser) => like.id === user?.id));
       },
     );
     return () => subscription?.unsubscribe();
-  }, [post?.id, user?.id, webSocketClient]);
+  }, [post.id, user?.id, webSocketClient]);
 
   useEffect(() => {
     const subscription = webSocketClient?.subscribe(
-      `/topic/comments/${post?.id}`,
+      `/topic/comments/${post.id}`,
       (message) => {
         const comment = JSON.parse(message.body);
-        setComments((prev) => [comment, ...prev]);
+        setComments((prev) => {
+          const index = prev.findIndex((c) => c.id === comment.id);
+          if (index === -1) {
+            return [comment, ...prev];
+          }
+          return prev.map((c) => (c.id === comment.id ? comment : c));
+        });
+      },
+    );
+
+    return () => subscription?.unsubscribe();
+  }, [post.id, webSocketClient]);
+
+  useEffect(() => {
+    const subscription = webSocketClient?.subscribe(
+      `/topic/comments/${post.id}/delete`,
+      (message) => {
+        const comment = JSON.parse(message.body);
+        setComments((prev) => {
+          return prev.filter((c) => c.id !== comment.id);
+        });
+      },
+    );
+
+    return () => subscription?.unsubscribe();
+  }, [post.id, webSocketClient]);
+
+  useEffect(() => {
+    const subscription = webSocketClient?.subscribe(
+      `/topic/posts/${post.id}/delete`,
+      () => {
+        setPosts((prev) => prev.filter((p) => p.id !== post.id));
       },
     );
     return () => subscription?.unsubscribe();
-  }, [post?.id, webSocketClient]);
+  }, [post.id, setPosts, webSocketClient]);
+
+  useEffect(() => {
+    const subscription = webSocketClient?.subscribe(
+      `/topic/posts/${post.id}/edit`,
+      (data) => {
+        const post = JSON.parse(data.body);
+        setPosts((prev) => prev.map((p) => (p.id === post.id ? post : p)));
+      },
+    );
+    return () => subscription?.unsubscribe();
+  }, [post.id, setPosts, webSocketClient]);
 
   useEffect(() => {
     const fetchLikes = async () => {
-      await request<User[]>({
+      await request<IUser[]>({
         endpoint: `/api/v1/feed/posts/${post.id}/likes`,
         onSuccess: (data) => {
           setLikes(data);
@@ -102,7 +140,7 @@ export default function Post({ post, setPosts }: PostProps) {
   }, [post.id, user?.id]);
 
   const like = async () => {
-    await request<Post>({
+    await request<IPost>({
       endpoint: `/api/v1/feed/posts/${post.id}/like`,
       method: "PUT",
       onSuccess: () => {},
@@ -117,7 +155,7 @@ export default function Post({ post, setPosts }: PostProps) {
     if (!content) {
       return;
     }
-    await request<Post>({
+    await request<IPost>({
       endpoint: `/api/v1/feed/posts/${post.id}/comments`,
       method: "POST",
       body: JSON.stringify({ content }),
@@ -142,7 +180,7 @@ export default function Post({ post, setPosts }: PostProps) {
   };
 
   const editComment = async (id: number, content: string) => {
-    await request<Comment>({
+    await request<IComment>({
       endpoint: `/api/v1/feed/comments/${id}`,
       method: "PUT",
       body: JSON.stringify({ content }),
@@ -176,7 +214,7 @@ export default function Post({ post, setPosts }: PostProps) {
   };
 
   const editPost = async (content: string, picture: string) => {
-    await request<Post>({
+    await request<IPost>({
       endpoint: `/api/v1/feed/posts/${post.id}`,
       method: "PUT",
       body: JSON.stringify({ content, picture }),
@@ -218,7 +256,7 @@ export default function Post({ post, setPosts }: PostProps) {
               }}>
               <img
                 className={classes.avatar}
-                src={post.author.profilePicture || "/avatar.png"}
+                src={post.author.profilePicture || "/avatar.svg"}
                 alt=""
               />
             </button>
@@ -286,16 +324,22 @@ export default function Post({ post, setPosts }: PostProps) {
         </div>
         <div className={classes.actions}>
           <button
+            disabled={postLiked == undefined}
             onClick={like}
-            className={postLiked ? classes.active : ""}
-            disabled={postLiked === undefined}>
+            className={postLiked ? classes.active : ""}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 512 512"
               fill="currentColor">
               <path d="M225.8 468.2l-2.5-2.3L48.1 303.2C17.4 274.7 0 234.7 0 192.8l0-3.3c0-70.4 50-130.8 119.2-144C158.6 37.9 198.9 47 231 69.6c9 6.4 17.4 13.8 25 22.3c4.2-4.8 8.7-9.2 13.5-13.3c3.7-3.2 7.5-6.2 11.5-9c0 0 0 0 0 0C313.1 47 353.4 37.9 392.8 45.4C462 58.6 512 119.1 512 189.5l0 3.3c0 41.9-17.4 81.9-48.1 110.4L288.7 465.9l-2.5 2.3c-8.2 7.6-19 11.9-30.2 11.9s-22-4.2-30.2-11.9zM239.1 145c-.4-.3-.7-.7-1-1.1l-17.8-20-.1-.1s0 0 0 0c-23.1-25.9-58-37.7-92-31.2C81.6 101.5 48 142.1 48 189.5l0 3.3c0 28.5 11.9 55.8 32.8 75.2L256 430.7 431.2 268c20.9-19.4 32.8-46.7 32.8-75.2l0-3.3c0-47.3-33.6-88-80.1-96.9c-34-6.5-69 5.4-92 31.2c0 0 0 0-.1 .1s0 0-.1 .1l-17.8 20c-.3 .4-.7 .7-1 1.1c-4.5 4.5-10.6 7-16.9 7s-12.4-2.5-16.9-7z" />
             </svg>
-            <span>Like</span>
+            <span>
+              {postLiked == undefined
+                ? "Loading"
+                : postLiked
+                  ? "Liked"
+                  : "Like"}
+            </span>
           </button>
           <button
             onClick={() => {
@@ -324,7 +368,7 @@ export default function Post({ post, setPosts }: PostProps) {
               />
             </form>
 
-            {comments?.map((comment) => (
+            {comments.map((comment) => (
               <Comment
                 editComment={editComment}
                 deleteComment={deleteComment}

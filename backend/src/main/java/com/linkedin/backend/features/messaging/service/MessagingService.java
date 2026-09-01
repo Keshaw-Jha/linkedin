@@ -1,6 +1,6 @@
 package com.linkedin.backend.features.messaging.service;
 
-import com.linkedin.backend.features.authentication.model.AuthenticationUser;
+import com.linkedin.backend.features.authentication.model.User;
 import com.linkedin.backend.features.authentication.service.AuthenticationService;
 import com.linkedin.backend.features.messaging.model.Conversation;
 import com.linkedin.backend.features.messaging.model.Message;
@@ -26,11 +26,11 @@ public class MessagingService {
         this.notificationService = notificationService;
     }
 
-    public List<Conversation> getConversationsOfUser(AuthenticationUser user) {
+    public List<Conversation> getConversationsOfUser(User user) {
         return conversationRepository.findByAuthorOrRecipient(user, user);
     }
 
-    public Conversation getConversation(AuthenticationUser user, Long conversationId) {
+    public Conversation getConversation(User user, Long conversationId) {
         Conversation conversation = conversationRepository.findById(conversationId).orElseThrow(() -> new IllegalArgumentException("Conversation not found."));
         if (!conversation.getAuthor().getId().equals(user.getId()) && !conversation.getRecipient().getId().equals(user.getId())) {
             throw new IllegalArgumentException("User not authorized to view conversation");
@@ -39,8 +39,8 @@ public class MessagingService {
     }
 
     @Transactional
-    public Conversation createConversationAndAddMessage(AuthenticationUser sender, Long receiverId, String content) {
-        AuthenticationUser receiver = authenticationService.getUserById(receiverId);
+    public Conversation createConversationAndAddMessage(User sender, Long receiverId, String content) {
+        User receiver = authenticationService.getUserById(receiverId);
         conversationRepository.findByAuthorAndRecipient(sender, receiver).ifPresentOrElse(
                 conversation -> {
                     throw new IllegalArgumentException("Conversation already exists, use the conversation id to send messages.");
@@ -62,8 +62,8 @@ public class MessagingService {
         return conversation;
     }
 
-    public Message addMessageToConversation(Long conversationId, AuthenticationUser sender, Long receiverId, String content) {
-        AuthenticationUser receiver = authenticationService.getUserById(receiverId);
+    public Message addMessageToConversation(Long conversationId, User sender, Long receiverId, String content) {
+        User receiver = authenticationService.getUserById(receiverId);
         Conversation conversation = conversationRepository.findById(conversationId).orElseThrow(() -> new IllegalArgumentException("Conversation not found"));
 
         if (!conversation.getAuthor().getId().equals(sender.getId()) && !conversation.getRecipient().getId().equals(sender.getId())) {
@@ -82,7 +82,7 @@ public class MessagingService {
         return message;
     }
 
-    public void markMessageAsRead(AuthenticationUser user, Long messageId) {
+    public void markMessageAsRead(User user, Long messageId) {
         Message message = messageRepository.findById(messageId).orElseThrow(() -> new IllegalArgumentException("Message not found."));
         if (!message.getReceiver().getId().equals(user.getId())) {
             throw new IllegalArgumentException("User not authorized to mark message as read.");

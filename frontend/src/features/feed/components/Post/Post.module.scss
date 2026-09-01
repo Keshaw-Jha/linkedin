@@ -30,9 +30,8 @@
     align-items: center;
   }
 
-  .date {
-    color: #666;
-    font-size: 0.8rem;
+  .picture {
+    width: 100%;
   }
 
   .actions {
@@ -56,6 +55,7 @@
       &.active {
         color: var(--primary-color);
       }
+
       &[disabled] {
         cursor: wait;
       }

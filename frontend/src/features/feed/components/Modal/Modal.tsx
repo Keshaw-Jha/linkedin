@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import { type Dispatch, type SetStateAction, useState } from "react";
 import { Button } from "../../../../components/Button/Button";
 import { Input } from "../../../../components/Input/Input";
 import classes from "./Modal.module.scss";

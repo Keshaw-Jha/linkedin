@@ -58,7 +58,7 @@ export default function Conversation(props: ConversationItemProps) {
       onClick={() => navigate(`/messaging/conversations/${conversation.id}`)}>
       <img
         className={classes.avatar}
-        src={conversationUserToDisplay.profilePicture}
+        src={conversationUserToDisplay.profilePicture || "/avatar.png"}
         alt=""
       />
       {unreadMessageCount > 0 && (

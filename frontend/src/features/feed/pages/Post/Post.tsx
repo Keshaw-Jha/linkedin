@@ -2,15 +2,15 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { request } from "../../../../utils/api";
 import LeftSidebar from "../../components/LeftSidebar/LeftSidebar";
-import Post, { type Post as PostType } from "../../components/Post/Post";
+import Post, { type IPost } from "../../components/Post/Post";
 import RightSidebar from "../../components/RightSidebar/RightSidebar";
 import classes from "./Post.module.scss";
 export function PostPage() {
-  const [posts, setPosts] = useState<PostType[]>([]);
+  const [posts, setPosts] = useState<IPost[]>([]);
   const { id } = useParams();
 
   useEffect(() => {
-    request<PostType>({
+    request<IPost>({
       endpoint: `/api/v1/feed/posts/${id}`,
       onSuccess: (post) => setPosts([post]),
       onFailure: (error) => console.log(error),

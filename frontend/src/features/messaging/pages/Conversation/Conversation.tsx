@@ -10,6 +10,7 @@ import { useWebSocket } from "../../../ws/WsContext";
 import { type IConversation } from "../../components/Conversations/Conversations";
 import Messages from "../../components/Messages/Messages";
 import classes from "./Conversation.module.scss";
+import type { IConnection } from "../../../networking/components/Connection/Connection";
 export function Conversation() {
   const [postingMessage, setPostingMessage] = useState<boolean>(false);
   const [content, setContent] = useState<string>("");
@@ -57,9 +58,14 @@ export function Conversation() {
   useEffect(() => {
     if (id == "new") {
       setConversation(null);
-      request<IUser[]>({
-        endpoint: "/api/v1/authentication/users",
-        onSuccess: (data) => setSuggestingUsers(data),
+      request<IConnection[]>({
+        endpoint: "/api/v1/networking/connections",
+        onSuccess: (data) =>
+          setSuggestingUsers(
+            data.map((c) =>
+              c.author.id === user?.id ? c.recipient : c.author,
+            ),
+          ),
         onFailure: (error) => console.log(error),
       });
     } else {
@@ -69,7 +75,7 @@ export function Conversation() {
         onFailure: () => navigate("/messaging"),
       });
     }
-  }, [id, navigate]);
+  }, [user, id, navigate]);
 
   useEffect(() => {
     const subscription = websocketClient?.subscribe(
@@ -159,7 +165,7 @@ export function Conversation() {
             <div className={classes.top}>
               <img
                 className={classes.avatar}
-                src={conversationUserToDisplay?.profilePicture}
+                src={conversationUserToDisplay?.profilePicture || "/avatar.png"}
                 alt=""
               />
               <div>
@@ -183,6 +189,7 @@ export function Conversation() {
               </p>
               {!slectedUser && (
                 <Input
+                  disabled={suggestingUsers.length === 0}
                   type="text"
                   name="recipient"
                   placeholder="Type a name"
@@ -256,6 +263,9 @@ export function Conversation() {
                     ))}
                 </div>
               )}
+              {suggestingUsers.length === 0 && (
+                <div>You need to have connections to start a conversation.</div>
+              )}
             </form>
           )}
           {conversation && (
@@ -287,7 +297,11 @@ export function Conversation() {
             <button
               type="submit"
               className={classes.send}
-              disabled={postingMessage || !content.trim()}>
+              disabled={
+                postingMessage ||
+                !content.trim() ||
+                (creatingNewConversation && !slectedUser)
+              }>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 512 512"

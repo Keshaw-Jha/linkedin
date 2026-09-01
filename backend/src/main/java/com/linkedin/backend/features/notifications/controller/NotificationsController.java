@@ -1,6 +1,6 @@
 package com.linkedin.backend.features.notifications.controller;
 
-import com.linkedin.backend.features.authentication.model.AuthenticationUser;
+import com.linkedin.backend.features.authentication.model.User;
 import com.linkedin.backend.features.notifications.model.Notification;
 import com.linkedin.backend.features.notifications.service.NotificationService;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +17,7 @@ public class NotificationsController {
     }
 
     @GetMapping
-    public List<Notification> getUserNotifications(@RequestAttribute("authenticatedUser") AuthenticationUser user) {
+    public List<Notification> getUserNotifications(@RequestAttribute("authenticatedUser") User user) {
         return notificationService.getUserNotifications(user);
     }
 

@@ -3,8 +3,8 @@ package com.linkedin.backend.features.authentication.service;
 
 import com.linkedin.backend.features.authentication.dto.AuthenticationRequestBody;
 import com.linkedin.backend.features.authentication.dto.AuthenticationResponseBody;
-import com.linkedin.backend.features.authentication.model.AuthenticationUser;
-import com.linkedin.backend.features.authentication.repository.AuthenticationUserRepository;
+import com.linkedin.backend.features.authentication.model.User;
+import com.linkedin.backend.features.authentication.repository.UserRepository;
 import com.linkedin.backend.features.authentication.utils.EmailService;
 import com.linkedin.backend.features.authentication.utils.Encoder;
 import com.linkedin.backend.features.authentication.utils.JsonWebToken;
@@ -29,7 +29,7 @@ public class AuthenticationService {
 
     private final Encoder encoder;
     private final JsonWebToken jsonWebToken;
-    private final AuthenticationUserRepository authenticationUserRepository;
+    private final UserRepository authenticationUserRepository;
     private final EmailService emailService;
     private static final SecureRandom RANDOM = new SecureRandom();
 
@@ -37,7 +37,7 @@ public class AuthenticationService {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public AuthenticationService(AuthenticationUserRepository authenticationUserRepository, Encoder encoder, JsonWebToken jsonWebToken, EmailService emailService) {
+    public AuthenticationService(UserRepository authenticationUserRepository, Encoder encoder, JsonWebToken jsonWebToken, EmailService emailService) {
         this.authenticationUserRepository = authenticationUserRepository;
         this.encoder = encoder;
         this.jsonWebToken = jsonWebToken;
@@ -52,14 +52,14 @@ public class AuthenticationService {
         return token.toString();
     }
 
-    public AuthenticationUser getUser(String email) {
+    public User getUser(String email) {
         return authenticationUserRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 
     // Generate & send email verification token
 
     public void sendEmailVerificationToken(String email) {
-        Optional<AuthenticationUser> user = authenticationUserRepository.findByEmail(email);
+        Optional<User> user = authenticationUserRepository.findByEmail(email);
         if (user.isPresent() && !user.get().getEmailVerified()) {
             String emailVerificationToken = generateEmailVerificationToken();
             String hashedToken = encoder.encode(emailVerificationToken);
@@ -81,7 +81,7 @@ public class AuthenticationService {
     // validation email verification token
 
     public void validateEmailVerificationToken(String token, String email) {
-        Optional<AuthenticationUser> user = authenticationUserRepository.findByEmail(email);
+        Optional<User> user = authenticationUserRepository.findByEmail(email);
         if (user.isPresent() && encoder.matches(token, user.get().getEmailVerificationToken()) && !user.get().getEmailVerificationTokenExpiryDate().isBefore(LocalDateTime.now())) {
             user.get().setEmailVerified(true);
             user.get().setEmailVerificationToken(null);
@@ -95,7 +95,7 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponseBody login(@Valid AuthenticationRequestBody loginRequestBody) {
-        AuthenticationUser user = authenticationUserRepository.findByEmail(loginRequestBody.getEmail()).orElseThrow(() -> new IllegalArgumentException("User not found."));
+        User user = authenticationUserRepository.findByEmail(loginRequestBody.getEmail()).orElseThrow(() -> new IllegalArgumentException("User not found."));
         if (!encoder.matches(loginRequestBody.getPassword(), user.getPassword())) {
             throw new IllegalArgumentException("Password is incorrect.");
         }
@@ -105,7 +105,7 @@ public class AuthenticationService {
 
     public AuthenticationResponseBody register(AuthenticationRequestBody registerRequestBody) {
         // Create User and email verification token
-        AuthenticationUser user = authenticationUserRepository.save(new AuthenticationUser(registerRequestBody.getEmail(), encoder.encode(registerRequestBody.getPassword())));
+        User user = authenticationUserRepository.save(new User(registerRequestBody.getEmail(), encoder.encode(registerRequestBody.getPassword())));
 
         String emailVerificationToken = generateEmailVerificationToken();
         String hashedToken = encoder.encode(emailVerificationToken);
@@ -133,7 +133,7 @@ public class AuthenticationService {
 
     // password reset logic
     public void sendPasswordResetToken(String email) {
-        Optional<AuthenticationUser> user = authenticationUserRepository.findByEmail(email);
+        Optional<User> user = authenticationUserRepository.findByEmail(email);
         if (user.isPresent()) {
             String passwordResetToken = generateEmailVerificationToken();
             String hashedToken = encoder.encode(passwordResetToken);
@@ -157,7 +157,7 @@ public class AuthenticationService {
     }
 
     public void resetPassword(String email, String newPassword, String token) {
-        Optional<AuthenticationUser> user = authenticationUserRepository.findByEmail(email);
+        Optional<User> user = authenticationUserRepository.findByEmail(email);
         if (user.isPresent() && encoder.matches(token, user.get().getPasswordResetToken()) && !user.get().getPasswordResetTokenExpiryDate().isBefore(LocalDateTime.now())) {
             user.get().setPasswordResetToken(null);
             user.get().setPasswordResetTokenExpiryDate(null);
@@ -170,8 +170,8 @@ public class AuthenticationService {
         }
     }
 
-    public AuthenticationUser updateUserProfile(Long id, String firstName, String lastName, String company, String position, String location) {
-        AuthenticationUser user = authenticationUserRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+    public User updateUserProfile(Long id, String firstName, String lastName, String company, String position, String location) {
+        User user = authenticationUserRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
         if (firstName != null) user.setFirstName(firstName);
         if (lastName != null) user.setLastName(lastName);
         if (company != null) user.setCompany(company);
@@ -183,7 +183,7 @@ public class AuthenticationService {
 
     @Transactional
     public void deleteUser(Long userId) {
-        AuthenticationUser user = entityManager.find(AuthenticationUser.class, userId);
+        User user = entityManager.find(User.class, userId);
         if (user != null) {
             entityManager.createNativeQuery("DELETE FROM posts_likes where user_id = :userId").setParameter("userId", userId)
                     .executeUpdate();
@@ -191,11 +191,11 @@ public class AuthenticationService {
         }
     }
 
-    public List<AuthenticationUser> getUsersWithoutAuthenticated(AuthenticationUser user) {
+    public List<User> getUsersWithoutAuthenticated(User user) {
         return authenticationUserRepository.findAllByIdNot(user.getId());
     }
 
-    public AuthenticationUser getUserById(Long id) {
+    public User getUserById(Long id) {
         return authenticationUserRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
     }
 }
