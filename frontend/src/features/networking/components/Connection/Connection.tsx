@@ -3,8 +3,14 @@ import { Button } from "../../../../components/Button/Button";
 import { request } from "../../../../utils/api";
 import { type IUser } from "../../../authentication/contexts/AuthenticationContextProvider";
 
+import { useNavigate } from "react-router-dom";
 import classes from "./Connection.module.scss";
 import { Status } from "../../../../enums/ConnectionType";
+
+// export enum Status {
+//   PENDING = "PENDING",
+//   ACCEPTED = "ACCEPTED",
+// }
 
 export interface IConnection {
   id: number;
@@ -26,6 +32,7 @@ export default function Connection({
   user,
   setConnections,
 }: IConnectionProps) {
+  const navigate = useNavigate();
   const userToDisplay =
     connection.author.id === user?.id
       ? connection.recipient
@@ -44,19 +51,21 @@ export default function Connection({
 
   return (
     <div key={connection.id} className={classes.connection}>
-      <img
-        className={classes.avatar}
-        src={userToDisplay.profilePicture || "/avatar.svg"}
-        alt=""
-      />
-      <div>
+      <button onClick={() => navigate("/profile/" + userToDisplay.id)}>
+        <img
+          className={classes.avatar}
+          src={userToDisplay.profilePicture || "/avatar.png"}
+          alt=""
+        />
+      </button>
+      <button onClick={() => navigate("/profile/" + userToDisplay.id)}>
         <h3 className={classes.name}>
           {userToDisplay?.firstName + " " + userToDisplay.lastName}
         </h3>
         <p>
           {userToDisplay?.position} at {userToDisplay?.company}
         </p>
-      </div>
+      </button>
       <div className={classes.actions}>
         {connection.status === Status.ACCEPTED ? (
           <Button

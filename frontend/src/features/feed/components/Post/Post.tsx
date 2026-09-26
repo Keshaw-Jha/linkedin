@@ -1,9 +1,9 @@
 import {
   type Dispatch,
-  type SubmitEvent,
   type SetStateAction,
   useEffect,
   useState,
+  type SubmitEvent,
 } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input } from "../../../../components/Input/Input";
@@ -12,11 +12,11 @@ import {
   type IUser,
   useAuthentication,
 } from "../../../authentication/contexts/AuthenticationContextProvider";
+import { useWebSocket } from "../../../ws/WsContext";
 import { Comment, type IComment } from "../Comment/Comment";
 import { Madal } from "../Modal/Modal";
 import TimeAgo from "../TimeAgo/TimeAgo";
 import classes from "./Post.module.scss";
-import { useWebSocket } from "../../../ws/WsContext";
 
 export interface IPost {
   id: number;
@@ -256,7 +256,7 @@ export default function Post({ post, setPosts }: PostProps) {
               }}>
               <img
                 className={classes.avatar}
-                src={post.author.profilePicture || "/avatar.svg"}
+                src={post.author.profilePicture || "/avatar.png"}
                 alt=""
               />
             </button>
@@ -267,7 +267,11 @@ export default function Post({ post, setPosts }: PostProps) {
               <div className={classes.title}>
                 {post.author.position + " at " + post.author.company}
               </div>
-              <TimeAgo date={post.creationDate} edited={!!post.updatedDate} />
+              <TimeAgo
+                date={post.creationDate}
+                edited={!!post.updatedDate}
+                className={classes.date}
+              />
             </div>
           </div>
           <div>

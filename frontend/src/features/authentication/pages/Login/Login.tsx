@@ -4,17 +4,20 @@ import { Box } from "../../components/Box/Box";
 import { Button } from "../../components/Button/Button";
 import { Input } from "../../components/Input/Input";
 import { Seperator } from "../../components/Seperator/Seperator";
-// import { useAuthentication } from "../../contexts/AuthenticationContextProvider";
 import classes from "./Login.module.scss";
 import { useAuthentication } from "../../contexts/AuthenticationContextProvider";
+import Loader from "../../../../components/Loader/Loader";
+import usePageTitle from "../../../../hooks/usePageTitle";
+import { useOauth } from "../../hooks/useOauth";
 
 export default function Login() {
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
+  const { login } = useAuthentication();
   const location = useLocation();
   const navigate = useNavigate();
-  const { login } = useAuthentication();
+  const { isOauthInProgress, oauthError, startOauth } = useOauth("login");
+  usePageTitle("Login");
 
   const doLogin = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -37,13 +40,15 @@ export default function Login() {
     }
   };
 
-  
+  if (isOauthInProgress) {
+    return <Loader />;
+  }
+
   return (
     <div className={classes.root}>
       <Box>
         <h1>Sign in</h1>
         <p>Stay updated on your professional world.</p>
-        {/* <form onSubmit={doLogin}> */}
         <form onSubmit={doLogin}>
           <Input
             label="Email"
@@ -62,10 +67,24 @@ export default function Login() {
           <Button type="submit" disabled={isLoading}>
             {isLoading ? "..." : "Sign in"}
           </Button>
-          <Link to="/authentication/request-password-reset">Forgot password?</Link>
+          <Link to="/authentication/request-password-reset">
+            Forgot password?
+          </Link>
         </form>
         <Seperator>Or</Seperator>
         <div className={classes.register}>
+          {oauthError && <p className={classes.error}>{oauthError}</p>}
+          <Button
+            outline
+            onClick={() => {
+              startOauth();
+            }}
+            style={{ gap: "5px" }}>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512">
+              <path d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z" />
+            </svg>
+            Continue with Google
+          </Button>
           New to LinkedIn? <Link to="/authentication/signup">Join now</Link>
         </div>
       </Box>

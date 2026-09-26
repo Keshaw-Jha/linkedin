@@ -1,27 +1,29 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import "./index.scss";
 import {
   createBrowserRouter,
   Navigate,
   RouterProvider,
 } from "react-router-dom";
-import Feed from "./features/feed/pages/Feed/Feed";
-import Login from "./features/authentication/pages/Login/Login";
-import Signup from "./features/authentication/pages/Signup/Signup";
-import ResetPassword from "./features/authentication/pages/ResetPassword/ResetPassword";
-import VerifyEmail from "./features/authentication/pages/VerifyEmail/VerifyEmail";
-import { AuthenticationContextProvider } from "./features/authentication/contexts/AuthenticationContextProvider";
-import { AuthenticationLayout } from "./features/authentication/components/AuthenticationLayout/AuthenticationLayout";
 import { ApplicationLayout } from "./components/ApplicationLayout/ApplicationLayout";
-import Profile from "./features/authentication/pages/Profile/Profile";
+import { AuthenticationLayout } from "./features/authentication/components/AuthenticationLayout/AuthenticationLayout";
+import { AuthenticationContextProvider } from "./features/authentication/contexts/AuthenticationContextProvider";
+import Login from "./features/authentication/pages/Login/Login";
+import LoginProfile from "./features/authentication/pages/Profile/Profile";
+import ResetPassword from "./features/authentication/pages/ResetPassword/ResetPassword";
+import Signup from "./features/authentication/pages/Signup/Signup";
+import VerifyEmail from "./features/authentication/pages/VerifyEmail/VerifyEmail";
+import Feed from "./features/feed/pages/Feed/Feed";
 import Notifications from "./features/feed/pages/Notifications/Notifications";
-import Messaging from "./features/messaging/pages/Messaging/Messaging";
-import Conversation from "./features/messaging/pages/Conversation/Conversation";
-import { Network } from "./features/networking/pages/Network/Network";
-import { Invitations } from "./features/networking/pages/Invitations/Invitations";
-import { Connections } from "./features/networking/pages/Connections/Connections";
 import { PostPage } from "./features/feed/pages/Post/Post";
+import Conversation from "./features/messaging/pages/Conversation/Conversation";
+import Messaging from "./features/messaging/pages/Messaging/Messaging";
+import { Connections } from "./features/networking/pages/Connections/Connections";
+import { Invitations } from "./features/networking/pages/Invitations/Invitations";
+import Network from "./features/networking/pages/Network/Network";
+import Posts from "./features/profile/pages/Posts/Posts";
+import Profile from "./features/profile/pages/Profile/Profile";
+import "./index.scss";
 
 const router = createBrowserRouter([
   {
@@ -58,10 +60,6 @@ const router = createBrowserRouter([
             ],
           },
           {
-            path: "jobs",
-            element: <div>Jobs</div>,
-          },
-          {
             path: "messaging",
             element: <Messaging />,
             children: [
@@ -77,11 +75,11 @@ const router = createBrowserRouter([
           },
           {
             path: "profile/:id",
-            element: <div>Profile</div>,
+            element: <Profile />,
           },
           {
-            path: "settings",
-            element: <div>Settings & Privacy</div>,
+            path: "profile/:id/posts",
+            element: <Posts />,
           },
         ],
       },
@@ -107,7 +105,7 @@ const router = createBrowserRouter([
           },
           {
             path: "profile/:id",
-            element: <Profile />,
+            element: <LoginProfile />,
           },
         ],
       },

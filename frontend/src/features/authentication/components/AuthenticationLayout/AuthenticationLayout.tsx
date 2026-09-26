@@ -3,13 +3,17 @@ import classes from "./AuthenticationLayout.module.scss";
 
 export function AuthenticationLayout() {
   return (
-    <div className={`${classes.root}`}>
-      <header className={classes.container}>
-        <a href="/">
-          <img src="/logo.svg" alt="" className={classes.logo} />
-        </a>
+    <div className={classes.root}>
+      <header>
+        <div className={classes.container}>
+          <a href="/">
+            <img src="/logo.svg" alt="" className={classes.logo} />
+          </a>
+        </div>
       </header>
-      <main className={classes.container}>{<Outlet />}</main>
+      <main className={classes.container}>
+        <Outlet />
+      </main>
       <footer>
         <ul className={classes.container}>
           <li>

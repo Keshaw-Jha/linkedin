@@ -1,22 +1,23 @@
 import { useEffect, useState } from "react";
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { Button } from "../../../../components/Button/Button";
+import usePageTitle from "../../../../hooks/usePageTitle";
 import { request } from "../../../../utils/api";
 import {
   type IUser,
   useAuthentication,
 } from "../../../authentication/contexts/AuthenticationContextProvider";
+import { useWebSocket } from "../../../ws/WsContext";
 import { type IConnection } from "../../components/Connection/Connection";
 import Title from "../../components/Title/Title";
 import classes from "./Network.module.scss";
-import { useWebSocket } from "../../../ws/WsContext";
-import usePageTitle from "../../../../hooks/usePageTitle";
 
-export function Network() {
+export default function Network() {
   usePageTitle("Network");
   const [connections, setConnections] = useState<IConnection[]>([]);
   const [invitations, setInvitations] = useState<IConnection[]>([]);
   const [suggestions, setSuggestions] = useState<IUser[]>([]);
+  const navigate = useNavigate();
   const ws = useWebSocket();
   const { user } = useAuthentication();
 
@@ -136,15 +137,17 @@ export function Network() {
               {suggestions.map((suggestion) => (
                 <div key={suggestion.id} className={classes.suggestion}>
                   <img
-                    src="https://images.unsplash.com/photo-1727163941315-1cc29bb49e54?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                    src={suggestion.coverPicture || "/cover.jpeg"}
                     alt=""
                     className={classes.cover}
                   />
-                  <img
-                    className={classes.avatar}
-                    src={suggestion.profilePicture}
-                    alt=""
-                  />
+                  <button onClick={() => navigate("/profile/" + suggestion.id)}>
+                    <img
+                      className={classes.avatar}
+                      src={suggestion.profilePicture || "/avatar.png"}
+                      alt=""
+                    />
+                  </button>
                   <div>
                     <h3 className={classes.name}>
                       {suggestion.firstName} {suggestion.lastName}

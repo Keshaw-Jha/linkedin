@@ -1,7 +1,10 @@
 import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { request } from "../../../../utils/api";
-import { type IUser } from "../../../authentication/contexts/AuthenticationContextProvider";
+import {
+  useAuthentication,
+  type IUser,
+} from "../../../authentication/contexts/AuthenticationContextProvider";
 import classes from "./Notifications.module.scss";
 import LeftSidebar from "../../components/LeftSidebar/LeftSidebar";
 import RightSidebar from "../../components/RightSidebar/RightSidebar";
@@ -24,6 +27,7 @@ export interface INotification {
 
 export default function Notifications() {
   const [notifications, setNotifications] = useState<INotification[]>([]);
+  const { user } = useAuthentication();
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -40,7 +44,7 @@ export default function Notifications() {
   return (
     <div className={classes.root}>
       <div className={classes.left}>
-        <LeftSidebar />
+        <LeftSidebar user={user} />
       </div>
       <div className={classes.center}>
         {notifications.map((notification) => (

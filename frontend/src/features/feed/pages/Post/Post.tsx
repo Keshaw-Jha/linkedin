@@ -5,9 +5,11 @@ import LeftSidebar from "../../components/LeftSidebar/LeftSidebar";
 import Post, { type IPost } from "../../components/Post/Post";
 import RightSidebar from "../../components/RightSidebar/RightSidebar";
 import classes from "./Post.module.scss";
+import { useAuthentication } from "../../../authentication/contexts/AuthenticationContextProvider";
 export function PostPage() {
   const [posts, setPosts] = useState<IPost[]>([]);
   const { id } = useParams();
+  const { user } = useAuthentication();
 
   useEffect(() => {
     request<IPost>({
@@ -20,7 +22,7 @@ export function PostPage() {
   return (
     <div className={classes.root}>
       <div className={classes.left}>
-        <LeftSidebar />
+        <LeftSidebar user={user} />
       </div>
       <div className={classes.center}>
         {posts.length > 0 && <Post setPosts={setPosts} post={posts[0]} />}

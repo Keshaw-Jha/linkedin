@@ -1,4 +1,4 @@
-import { type SubmitEvent, useEffect, useState } from "react";
+import { useEffect, useState, type SubmitEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Input } from "../../../../components/Input/Input";
 import { request } from "../../../../utils/api";
@@ -6,12 +6,12 @@ import {
   type IUser,
   useAuthentication,
 } from "../../../authentication/contexts/AuthenticationContextProvider";
+import { type IConnection } from "../../../networking/components/Connection/Connection";
 import { useWebSocket } from "../../../ws/WsContext";
 import { type IConversation } from "../../components/Conversations/Conversations";
 import Messages from "../../components/Messages/Messages";
 import classes from "./Conversation.module.scss";
-import type { IConnection } from "../../../networking/components/Connection/Connection";
-export function Conversation() {
+export default function Conversation() {
   const [postingMessage, setPostingMessage] = useState<boolean>(false);
   const [content, setContent] = useState<string>("");
   const [suggestingUsers, setSuggestingUsers] = useState<IUser[]>([]);
@@ -75,7 +75,7 @@ export function Conversation() {
         onFailure: () => navigate("/messaging"),
       });
     }
-  }, [user, id, navigate]);
+  }, [id, navigate]);
 
   useEffect(() => {
     const subscription = websocketClient?.subscribe(
@@ -134,7 +134,7 @@ export function Conversation() {
       receiverId: slectedUser?.id,
       content,
     };
-    console.log(message);
+
     await request<IConversation>({
       endpoint: "/api/v1/messaging/conversations",
       method: "POST",
@@ -163,11 +163,18 @@ export function Conversation() {
           </div>
           {conversation && (
             <div className={classes.top}>
-              <img
-                className={classes.avatar}
-                src={conversationUserToDisplay?.profilePicture || "/avatar.png"}
-                alt=""
-              />
+              <button
+                onClick={() =>
+                  navigate(`/profile/${conversationUserToDisplay?.id}`)
+                }>
+                <img
+                  className={classes.avatar}
+                  src={
+                    conversationUserToDisplay?.profilePicture || "/avatar.png"
+                  }
+                  alt=""
+                />
+              </button>
               <div>
                 <div className={classes.name}>
                   {conversationUserToDisplay?.firstName}{" "}
@@ -263,17 +270,14 @@ export function Conversation() {
                     ))}
                 </div>
               )}
+
               {suggestingUsers.length === 0 && (
                 <div>You need to have connections to start a conversation.</div>
               )}
             </form>
           )}
           {conversation && (
-            <Messages
-              messages={conversation.messages}
-              user={user}
-              conversationId={conversation.id}
-            />
+            <Messages messages={conversation.messages} user={user} />
           )}
           <form
             className={classes.form}
@@ -315,5 +319,3 @@ export function Conversation() {
     </div>
   );
 }
-
-export default Conversation;

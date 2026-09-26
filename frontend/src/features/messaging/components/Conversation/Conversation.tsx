@@ -21,7 +21,7 @@ export default function Conversation(props: ConversationItemProps) {
       ? conversation.author
       : conversation.recipient;
   const unreadMessageCount = conversation.messages.filter(
-    (message) => message.receiver.id === user.id && !message.isRead,
+    (message) => message.receiver.id === user?.id && !message.isRead,
   ).length;
   const ws = useWebSocket();
 

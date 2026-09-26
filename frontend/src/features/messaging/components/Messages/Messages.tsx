@@ -14,7 +14,7 @@ export interface IMessage {
 export interface IMessagesProps {
   messages: IMessage[];
   user: IUser | null;
-  conversationId: number;
+  // conversationId: number;
 }
 
 export default function Messages({ messages, user }: IMessagesProps) {

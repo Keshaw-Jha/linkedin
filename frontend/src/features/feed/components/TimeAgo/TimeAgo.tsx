@@ -18,7 +18,7 @@ export default function TimeAgo({
   useEffect(() => {
     const interval = setInterval(() => {
       setTime(timeAgo(new Date(date)));
-    }, 30000);
+    }, 10000);
 
     return () => clearInterval(interval);
   }, [date]);

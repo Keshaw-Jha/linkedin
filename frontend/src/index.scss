@@ -12,8 +12,9 @@
 }
 
 html {
-  font-family: "Poppins", sans-serif;
+  font-family: Poppins, sans-serif;
   background-color: #f4f2ee;
+  overflow-x: hidden;
 }
 
 img {
@@ -27,6 +28,7 @@ button {
   border: none;
   background-color: transparent;
   cursor: pointer;
+  text-align: left;
 }
 
 a {
@@ -35,4 +37,8 @@ a {
 
 ul {
   list-style: none;
+}
+
+strong {
+  font-weight: 600;
 }

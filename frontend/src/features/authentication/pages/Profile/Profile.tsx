@@ -3,8 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "../../../../components/Button/Button";
 import { Input } from "../../../../components/Input/Input";
 import { Box } from "../../components/Box/Box";
-import { useAuthentication } from "../../contexts/AuthenticationContextProvider";
+import {
+  useAuthentication,
+  type IUser,
+} from "../../contexts/AuthenticationContextProvider";
 import classes from "./Profile.module.scss";
+import { request } from "../../../../utils/api";
 
 export default function Profile() {
   const [step, setStep] = useState(0);
@@ -12,11 +16,11 @@ export default function Profile() {
   const { user, setUser } = useAuthentication();
   const [error, setError] = useState("");
   const [data, setData] = useState({
-    firstName: "",
-    lastName: "",
-    company: "",
-    position: "",
-    location: "",
+    firstName: user?.firstName || "",
+    lastName: user?.lastName || "",
+    company: user?.company || "",
+    position: user?.position || "",
+    location: user?.location || "",
   });
   const onSubmit = async () => {
     if (!data.firstName || !data.lastName) {
@@ -31,36 +35,16 @@ export default function Profile() {
       setError("Please fill in your location.");
       return;
     }
-    try {
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/v1/authentication/profile/${user?.id}?firstName=${
-          data.firstName
-        }&lastName=${data.lastName}&company=${data.company}&position=${data.position}&location=${
-          data.location
-        }`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        },
-      );
-      if (res.ok) {
-        const updatedUser = await res.json();
-        setUser(updatedUser);
-      } else {
-        const { message } = await res.json();
-        throw new Error(message);
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        setError(error.message);
-      } else {
-        setError("An unknown error occurred.");
-      }
-    } finally {
-      navigate("/");
-    }
+    await request<IUser>({
+      endpoint: `/api/v1/authentication/profile/${user?.id}?firstName=${data.firstName}&lastName=${data.lastName}&company=${data.company}&position=${data.position}&location=${data.location}`,
+      method: "PUT",
+      body: JSON.stringify(data),
+      onSuccess: (data) => {
+        setUser(data);
+        navigate("/");
+      },
+      onFailure: (error) => setError(error),
+    });
   };
   return (
     <div className={classes.root}>
@@ -79,7 +63,8 @@ export default function Profile() {
               placeholder="Jhon"
               onChange={(e) =>
                 setData((prev) => ({ ...prev, firstName: e.target.value }))
-              }></Input>
+              }
+              value={data.firstName}></Input>
             <Input
               onFocus={() => setError("")}
               required
@@ -88,7 +73,8 @@ export default function Profile() {
               placeholder="Doe"
               onChange={(e) =>
                 setData((prev) => ({ ...prev, lastName: e.target.value }))
-              }></Input>
+              }
+              value={data.lastName}></Input>
           </div>
         )}
         {step === 1 && (
@@ -100,12 +86,14 @@ export default function Profile() {
               placeholder="Docker Inc"
               onChange={(e) =>
                 setData((prev) => ({ ...prev, company: e.target.value }))
-              }></Input>
+              }
+              value={data.company}></Input>
             <Input
               onFocus={() => setError("")}
               onChange={(e) =>
                 setData((prev) => ({ ...prev, position: e.target.value }))
               }
+              value={data.position}
               label="Latest position"
               name="position"
               placeholder="Software Engineer"></Input>
@@ -117,6 +105,7 @@ export default function Profile() {
             label="Location"
             name="location"
             placeholder="San Francisco, CA"
+            value={data.location}
             onChange={(e) =>
               setData((prev) => ({ ...prev, location: e.target.value }))
             }></Input>
