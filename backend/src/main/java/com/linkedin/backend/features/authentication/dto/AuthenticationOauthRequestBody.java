@@ -1,4 +1,4 @@
 package com.linkedin.backend.features.authentication.dto;
 
-public class AuthenticationOauthRequestBody {
+public record AuthenticationOauthRequestBody(String code, String page) {
 }
