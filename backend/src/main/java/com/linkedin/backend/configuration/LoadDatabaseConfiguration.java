@@ -8,9 +8,11 @@ import com.linkedin.backend.features.feed.repository.PostRepository;
 import com.linkedin.backend.features.networking.model.Connection;
 import com.linkedin.backend.features.networking.model.Status;
 import com.linkedin.backend.features.networking.repository.ConnectionRepository;
+import com.linkedin.backend.features.search.util.ReindexService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 import java.util.HashSet;
 import java.util.List;
@@ -31,6 +33,12 @@ public class LoadDatabaseConfiguration {
 //            createConnections(connectionRepository, users);
 //            createPosts(postRepository, users);
         };
+    }
+
+    @Bean
+    @Profile("reindex")
+    public CommandLineRunner reindexDatabase(ReindexService reindexService) {
+        return args -> reindexService.reindex();
     }
 
     private List<User> createUsers(UserRepository userRepository) {
