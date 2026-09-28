@@ -10,6 +10,7 @@ import Post, { type IPost } from "../../components/Post/Post.tsx";
 import { Madal } from "../../components/Modal/Modal.tsx";
 import { request } from "../../../../utils/api.ts";
 import usePageTitle from "../../../../hooks/usePageTitle.tsx";
+import Loader from "../../../../components/Loader/Loader.tsx";
 
 export default function Feed() {
   usePageTitle("Feed");
@@ -18,12 +19,16 @@ export default function Feed() {
   const navigate = useNavigate();
   const [posts, setPosts] = useState<IPost[]>([]);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPosts = async () => {
       await request<IPost[]>({
         endpoint: "/api/v1/feed",
-        onSuccess: (data) => setPosts(data),
+        onSuccess: (data) => {
+          setPosts(data);
+          setLoading(false);
+        },
         onFailure: (error) => setError(error),
       });
     };
@@ -68,16 +73,21 @@ export default function Feed() {
         </div>
         {error && <div className={classes.error}>{error}</div>}
 
-        <div className={classes.feed}>
-          {posts.map((post) => (
-            <Post key={post.id} post={post} setPosts={setPosts} />
-          ))}
-          {posts.length === 0 && (
-            <p>
-              Start connecting with people to build a feed that matters to you.
-            </p>
-          )}
-        </div>
+        {loading ? (
+          <Loader />
+        ) : (
+          <div className={classes.feed}>
+            {posts.map((post) => (
+              <Post key={post.id} post={post} setPosts={setPosts} />
+            ))}
+            {posts.length === 0 && (
+              <p>
+                Start connecting with poople to build a feed that matters to
+                you.
+              </p>
+            )}
+          </div>
+        )}
       </div>
       <div className={classes.right}>
         <RightSidebar />
