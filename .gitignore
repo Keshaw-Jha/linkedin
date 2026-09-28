@@ -63,3 +63,5 @@ out/
 /.nb-gradle/
 
 .env
+
+lucene
