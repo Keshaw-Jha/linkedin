@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { Button } from "../../../../components/Button/Button";
+import Loader from "../../../../components/Loader/Loader";
 import usePageTitle from "../../../../hooks/usePageTitle";
 import { request } from "../../../../utils/api";
 import {
@@ -17,6 +18,7 @@ export default function Network() {
   const [connections, setConnections] = useState<IConnection[]>([]);
   const [invitations, setInvitations] = useState<IConnection[]>([]);
   const [suggestions, setSuggestions] = useState<IUser[]>([]);
+  const [suggestionsLoading, setSuggestionsLoading] = useState(true);
   const navigate = useNavigate();
   const ws = useWebSocket();
   const { user } = useAuthentication();
@@ -42,7 +44,7 @@ export default function Network() {
       endpoint: "/api/v1/networking/suggestions",
       onSuccess: (data) => setSuggestions(data),
       onFailure: (error) => console.log(error),
-    });
+    }).then(() => setSuggestionsLoading(false));
   }, []);
 
   useEffect(() => {
@@ -130,9 +132,9 @@ export default function Network() {
       <div className={classes.content}>
         <Outlet />
 
-        {suggestions.length > 0 && (
-          <div className={classes.suggestions}>
-            <Title>People you may know</Title>
+        <div className={classes.suggestions}>
+          <Title>People you may know</Title>
+          {suggestions.length > 0 && (
             <div className={classes.list}>
               {suggestions.map((suggestion) => (
                 <div key={suggestion.id} className={classes.suggestion}>
@@ -148,7 +150,7 @@ export default function Network() {
                       alt=""
                     />
                   </button>
-                  <div>
+                  <div className={classes.info}>
                     <h3 className={classes.name}>
                       {suggestion.firstName} {suggestion.lastName}
                     </h3>
@@ -179,8 +181,12 @@ export default function Network() {
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          )}
+          {suggestionsLoading && <Loader isInline />}
+          {suggestions.length === 0 && !suggestionsLoading && (
+            <p>No suggestions available at the moment.</p>
+          )}
+        </div>
       </div>
     </div>
   );

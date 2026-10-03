@@ -37,7 +37,7 @@ export default function Signup() {
   };
 
   if (isOauthInProgress) {
-    return <Loader />;
+    return <Loader isInline />;
   }
 
   return (

@@ -74,7 +74,7 @@ export default function Feed() {
         {error && <div className={classes.error}>{error}</div>}
 
         {loading ? (
-          <Loader />
+          <Loader isInline />
         ) : (
           <div className={classes.feed}>
             {posts.map((post) => (

@@ -26,6 +26,13 @@ export const request = async <T>({
     });
 
     if (!response.ok) {
+      if (
+        response.status === 401 &&
+        !window.location.pathname.includes("authentication")
+      ) {
+        window.location.href = "/authentication/login";
+        return;
+      }
       const { message } = await response.json();
       throw new Error(message);
     }
